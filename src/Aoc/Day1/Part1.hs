@@ -5,7 +5,7 @@ import qualified Data.ByteString.Char8 as BC
 import Data.Maybe
 
 solve :: [BS.ByteString] -> String
-solve lines = show $ solve' $ fmap (fst . fromJust . BC.readInt) lines
+solve = show . solve' . fmap (fst . fromJust . BC.readInt)
 
 solve' :: [Int] -> Int
 solve' [] = 0
