@@ -4,20 +4,21 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC
 import Data.Maybe
 
-import qualified Aoc.Day2.Part1 as Part1
+import qualified Aoc.Day2.Part1 as P1
 
 data AimedPosition = AimedPosition {
-    position :: Part1.Position
+    position :: P1.Position
   , aim :: Int
 }
 
-nullAimedPosition = AimedPosition (Part1.Position 0 0) 0
+nullAimedPosition :: AimedPosition
+nullAimedPosition = AimedPosition P1.nullPosition 0
 
 solve :: [BS.ByteString] -> String
-solve = show . Part1.answer . position . (foldl execute nullAimedPosition) . fmap Part1.parse
+solve = show . P1.answer . position . (foldl execute nullAimedPosition) . fmap P1.parse
 
-execute :: AimedPosition -> Part1.Command -> AimedPosition
-execute (AimedPosition (Part1.Position h d) a) (Part1.Forward i) =
-    AimedPosition (Part1.Position (h + i) (d + a * i)) a
-execute (AimedPosition p a) (Part1.Down i) = AimedPosition p (a + i)
-execute (AimedPosition p a) (Part1.Up i) = AimedPosition p (a - i)
+execute :: AimedPosition -> P1.Command -> AimedPosition
+execute (AimedPosition (P1.Position h d) a) (P1.Forward i) =
+    AimedPosition (P1.Position (h + i) (d + a * i)) a
+execute (AimedPosition p a) (P1.Down i) = AimedPosition p (a + i)
+execute (AimedPosition p a) (P1.Up i) = AimedPosition p (a - i)

@@ -15,8 +15,11 @@ data Position = Position {
   , depth      :: Int
 } deriving (Show)
 
+nullPosition :: Position
+nullPosition = Position 0 0
+
 solve :: [BS.ByteString] -> String
-solve = show . answer . (foldl execute $ Position 0 0) . fmap parse
+solve = show . answer . (foldl execute nullPosition) . fmap parse
 
 answer :: Position -> Int
 answer p = horizontal p * depth p
