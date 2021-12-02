@@ -1,9 +1,6 @@
 module Aoc.Day2.Part2 where
 
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Char8 as BC
-import Data.Maybe
-
 import qualified Aoc.Day2.Part1 as P1
 
 data AimedPosition = AimedPosition {

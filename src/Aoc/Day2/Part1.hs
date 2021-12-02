@@ -22,7 +22,7 @@ solve :: [BS.ByteString] -> String
 solve = show . answer . (foldl execute nullPosition) . fmap parse
 
 answer :: Position -> Int
-answer p = horizontal p * depth p
+answer (Position h d) = h * d
 
 parse :: BS.ByteString -> Command
 parse line = case BC.split ' ' line of
@@ -34,6 +34,6 @@ parse line = case BC.split ' ' line of
     toInt = fst . fromJust . BC.readInt
 
 execute :: Position -> Command -> Position
-execute p (Forward i) = Position { horizontal = horizontal p + i, depth = depth p}
-execute p (Down i) = Position { horizontal = horizontal p, depth = depth p + i}
-execute p (Up i) = Position { horizontal = horizontal p, depth = depth p - i}
+execute (Position h d) (Forward i) = Position (h + i) d
+execute (Position h d) (Down i) = Position h (d + i)
+execute (Position h d) (Up i) = Position h (d - i)
