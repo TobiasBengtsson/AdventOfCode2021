@@ -2,21 +2,25 @@ module Aoc.Day3.Part2 where
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC
+import Control.Lens.Lens
 import Data.List
+
 import qualified Aoc.Day3.Part1 as P1
 
-solve :: [BS.ByteString] -> String
-solve lines = show $ o2genRating * co2ScrubRating
-  where
-    o2genRating = P1.binToDec $ solve' True 0 $ fmap BC.unpack lines
-    co2ScrubRating = P1.binToDec $ solve' False 0 $ fmap BC.unpack lines
+data BitCriteria = MCB | LCB
 
-solve' :: Bool -> Int -> [String] -> String
-solve' _ _ [] = error "No match found"
-solve' _ _ [x] = x
-solve' b i xs = solve' b (i + 1) $ filter meetCriteria xs
+solve :: [BS.ByteString] -> String
+solve = P1.answer . (??) (fmap solve' [MCB, LCB]) . fmap BC.unpack
+
+solve' :: BitCriteria -> [String] -> String
+solve' bc = search bc 0
+
+search :: BitCriteria -> Int -> [String] -> String
+search _ _ [] = error "No match found"
+search _ _ [x] = x
+search b i xs = search b (i + 1) $ filter meetCriteria xs
   where
     mcb = P1.mostCommonBit ((transpose xs) !! i)
-    meetCriteria line = case b of
-      True ->  line !! i == mcb
-      False -> line !! i /= mcb
+    meetCriteria line = operator b (line !! i) mcb
+    operator MCB = (==)
+    operator LCB = (/=)

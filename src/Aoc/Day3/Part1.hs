@@ -2,25 +2,34 @@ module Aoc.Day3.Part1 where
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC
+import Control.Lens.Lens
 import Data.Char (digitToInt)
-import Data.Maybe
-import Numeric
+import Data.Maybe (fromJust, listToMaybe)
+import Numeric (readInt)
 
 solve :: [BS.ByteString] -> String
-solve lines = show $ (binToDec lcbString) * (binToDec $ mcbString lines)
-  where
-    lcbString = fmap (\x -> if x == '1' then '0' else '1') $ mcbString lines
+solve = answer . (??) [fmap flipBit, id] . mcbString
 
+answer :: [String] -> String
+answer = show . product . fmap binToDec
+
+-- Returns a bitstring with the most common bit of each column
 mcbString :: [BS.ByteString] -> String
 mcbString = fmap mostCommonBit . fmap BC.unpack . BC.transpose
 
 mostCommonBit :: String -> Char
 mostCommonBit allBits
-  | bitCount >= zeroCount = '1'
-  | otherwise             = '0'
+  | cnt '1' >= cnt '0' = '1'
+  | otherwise          = '0'
   where
-    bitCount = length (filter (== '1') allBits)
-    zeroCount = length allBits - bitCount
+    cnt bit = elemCount bit allBits
+
+elemCount :: Eq a => a -> [a] -> Int
+elemCount e = length . filter (== e)
+
+flipBit :: Char -> Char
+flipBit '1' = '0'
+flipBit '0' = '1'
 
 binToDec :: Integral a => String -> a
 binToDec = fromJust . fmap fst . listToMaybe . readInt 2 (`elem` ['0','1']) digitToInt
