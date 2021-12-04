@@ -16,6 +16,7 @@ dependencies:
 - bytestring
 - containers
 - lens
+- split
 
 library:
   source-dirs: src
