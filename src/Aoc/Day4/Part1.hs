@@ -15,7 +15,11 @@ markNumber :: Int -> BingoBoard -> BingoBoard
 markNumber n (BingoBoard rows) = BingoBoard (fmap markRow rows)
   where
     markRow :: BingoRow -> BingoRow 
-    markRow row = fmap (\x -> if fst x then (True, snd x) else if snd x == n then (True, snd x) else (False, snd x)) row 
+    markRow row = fmap markCell row
+    markCell :: (Bool, Int) -> (Bool, Int)
+    markCell cell = case cell of
+      (False, x) | x == n -> (True, x)
+      otherwise           -> cell
 
 hasWon :: BingoBoard -> Bool
 hasWon (BingoBoard rows) = (or $ fmap rowComplete (transpose rows)) || (or $ fmap rowComplete rows)
@@ -30,18 +34,24 @@ boardScore (BingoBoard rows) = sum $ fmap rowScore rows
     cellScore :: (Bool, Int) -> Int
     cellScore (mark, n) = if mark then 0 else n
 
-solve :: [BS.ByteString] -> String
-solve lines = show $ (order !! (winAfterMoves - 1)) * (boardScore $ fst bestPlay)
-  where
-    order :: [Int]
-    order = (fmap toInt . BC.split ',' . head) lines
-    boards' = fmap readBoard $ splitOn [""] $ tail lines
-    winAfterMoves = minimum $ fmap snd boardMoves
-    boardMoves = fmap (\bm -> (fst bm, fromJust $ snd bm)) $ filter (\bm -> isJust $ snd bm) $ fmap (playToWin 1 order) boards'
-    bestPlay = head $ sortOn snd boardMoves
-
 readBoard :: [BS.ByteString] -> BingoBoard
 readBoard = BingoBoard . fmap bingoRow . fmap (fmap toInt . BC.words)
+
+readBoards :: [BS.ByteString] -> [BingoBoard]
+readBoards = fmap readBoard . splitOn [""]
+
+readDrawingList :: BS.ByteString -> [Int]
+readDrawingList = fmap toInt . BC.split ','
+
+solve :: [BS.ByteString] -> String
+solve (l:ls) = show $ lastCalledNumber * (boardScore $ fst bestPlay)
+  where
+    drawingList = readDrawingList l
+    boards = readBoards ls
+    winAfterMoves = minimum $ fmap snd boardMoves
+    lastCalledNumber = drawingList !! (winAfterMoves - 1)
+    boardMoves = fmap (\bm -> (fst bm, fromJust $ snd bm)) $ filter (\bm -> isJust $ snd bm) $ fmap (playToWin 1 drawingList) boards
+    bestPlay = head $ sortOn snd boardMoves
 
 playToWin :: Int -> [Int] -> BingoBoard -> (BingoBoard, Maybe Int)
 playToWin _ [] board = (board, Nothing)
