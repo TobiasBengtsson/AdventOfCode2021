@@ -79,11 +79,13 @@ library
       src
   default-extensions:
       OverloadedStrings
+      TupleSections
   build-depends:
       base >=4.7 && <5
     , bytestring
     , containers
     , lens
+    , multiset
     , split
   default-language: Haskell2010
 
@@ -100,5 +102,6 @@ executable AdventOfCode2021-exe
     , bytestring
     , containers
     , lens
+    , multiset
     , split
   default-language: Haskell2010

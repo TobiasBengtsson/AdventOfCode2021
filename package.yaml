@@ -16,12 +16,14 @@ dependencies:
 - bytestring
 - containers
 - lens
+- multiset
 - split
 
 library:
   source-dirs: src
   default-extensions:
     - OverloadedStrings
+    - TupleSections
 
 executables:
   AdventOfCode2021-exe:
