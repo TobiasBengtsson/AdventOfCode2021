@@ -23,6 +23,7 @@ library:
   source-dirs: src
   default-extensions:
     - OverloadedStrings
+    - ParallelListComp
     - TupleSections
 
 executables:

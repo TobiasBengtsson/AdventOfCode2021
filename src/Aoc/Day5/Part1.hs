@@ -19,15 +19,19 @@ readPoint s = (toInt (head splitStr), toInt (last splitStr))
     splitStr = BC.split ',' s
 
 solve :: [BS.ByteString] -> String
-solve = show . MultiSet.foldOccur (\p occ x -> if occ < 2 then x else x + 1) 0 . MultiSet.unions . fmap (MultiSet.fromList . traceLine . readLine)
+solve = show . countMultiple . MultiSet.unions . fmap (MultiSet.fromList . traceLine) . filter straight . fmap readLine
+
+countMultiple :: MultiSet.MultiSet a -> Int
+countMultiple = MultiSet.foldOccur (\p occ x -> if occ < 2 then x else x + 1) 0
+
+straight :: Line -> Bool
+straight ((x1, y1), (x2, y2)) = x1 == x2 || y1 == y2
 
 traceLine :: Line -> [Point]
-traceLine ((x1, y1), (x2, y2))
-  | x1 == x2 && y1 <  y2 = fmap (x1, ) [y1..y2]
-  | x1 == x2             = fmap (x1, ) [y2..y1]
-  | x1 <  x2 && y1 == y2 = fmap (, y1) [x1..x2]
-  |             y1 == y2 = fmap (, y1) [x2..x1]
-  | otherwise            = []
+traceLine ((x1, y1), (x2, y2)) =
+    [(x,y)
+      | x <- [x1,x1 + signum (x2 - x1)..x2]
+      | y <- [y1,y1 + signum (y2 - y1)..y2]]
 
 toInt :: BS.ByteString -> Int
 toInt = fst . Maybe.fromJust . BC.readInt
