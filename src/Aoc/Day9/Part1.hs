@@ -28,7 +28,10 @@ isSink p g = all (isLowerThan thisHeight) (surroundingHeights p g)
     thisHeight = fromJust $ height p g
 
 surroundingHeights :: Coord -> Grid -> [Maybe Int]
-surroundingHeights (x,y) g = map (`height` g) [(x+1, y), (x, y+1), (x-1, y), (x, y-1)]
+surroundingHeights p g = map (`height` g) $ surroundingPoints p
+
+surroundingPoints :: Coord -> [Coord]
+surroundingPoints (x,y) = [(x+1, y), (x, y+1), (x-1, y), (x, y-1)]
 
 height :: Coord -> Grid -> Maybe Int
 height = Map.lookup
