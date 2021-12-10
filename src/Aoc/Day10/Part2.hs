@@ -19,4 +19,4 @@ incompleteScore (Incomplete state) = foldl (\acc c -> acc * 5 + incompleteCharSc
 incompleteScore _ = 0
 
 incompleteCharScore :: Char -> Int
-incompleteCharScore c = fromMaybe 0 $ lookup c $ zip openings [1, 2, 3, 4]
+incompleteCharScore = fromMaybe 0 . flip lookup (zip openings [1, 2, 3, 4])

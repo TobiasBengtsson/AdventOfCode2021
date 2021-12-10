@@ -84,8 +84,10 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , composition-extra
     , containers
     , lens
+    , mtl
     , multiset
     , split
   default-language: Haskell2010
@@ -101,8 +103,10 @@ executable AdventOfCode2021-exe
       AdventOfCode2021
     , base >=4.7 && <5
     , bytestring
+    , composition-extra
     , containers
     , lens
+    , mtl
     , multiset
     , split
   default-language: Haskell2010
