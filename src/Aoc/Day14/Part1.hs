@@ -14,15 +14,16 @@ solve = solve' 10
 
 solve' n bss = show ((last occurs - head occurs) `div` 2)
   where
-    res = foldl' (\p _ -> step p (rules bss)) (initial bss) (replicate n 0)
+    res = foldr (const $ step (rules bss)) (initial bss) $ replicate n 0
     occurs = sort $ map snd (MS.toOccurList $ MS.concatMap (\(l,r) -> [l,r]) res)
 
-initial bss = readInitial $ BC.unpack $ head $ fst $ break (== "") bss
+initial :: [BS.ByteString] -> MS.MultiSet (Char, Char)
+initial = readInitial . BC.unpack . head
 
-rules bss = readRules (drop 1 $ snd $ break (== "") bss)
+rules = readRules . drop 2
 
-step :: MS.MultiSet (Char, Char) -> Rules -> MS.MultiSet (Char, Char)
-step pairs rules = MS.concatMap (`stepPair` rules) pairs
+step :: Rules -> MS.MultiSet (Char, Char) -> MS.MultiSet (Char, Char)
+step pairs = MS.concatMap (`stepPair` pairs)
 
 stepPair :: (Char, Char) -> Rules -> [(Char, Char)]
 stepPair p@(l,r) rules = [(l,m),(m,r)]
@@ -30,7 +31,7 @@ stepPair p@(l,r) rules = [(l,m),(m,r)]
     m = fromJust $ Map.lookup p rules
 
 readInitial :: String -> MS.MultiSet (Char, Char)
-readInitial s = MS.fromList $ zip s $ drop 1 s
+readInitial = MS.fromList . (zip <*> drop 1)
 
 readRules :: [BS.ByteString] -> Rules
 readRules = Map.unions . map readRule
