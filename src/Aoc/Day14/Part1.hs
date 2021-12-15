@@ -12,10 +12,12 @@ type Rules = Map.Map (Char, Char) Char
 solve :: [BS.ByteString] -> String
 solve = solve' 10
 
-solve' n bss = show ((last occurs - head occurs) `div` 2)
+solve' n bss = show $ last occurs - head occurs
   where
     res = foldr (const $ step (rules bss)) (initial bss) $ replicate n 0
-    occurs = sort $ map snd (MS.toOccurList $ MS.concatMap (\(l,r) -> [l,r]) res)
+    occurs = sort $ map (`div` 2) $ map snd (MS.toOccurList $ MS.insert headInit $ MS.insert lastInit $ MS.concatMap (\(l,r) -> [l,r]) res)
+    headInit = BC.head $ head bss
+    lastInit = BC.last $ head bss
 
 initial :: [BS.ByteString] -> MS.MultiSet (Char, Char)
 initial = readInitial . BC.unpack . head
