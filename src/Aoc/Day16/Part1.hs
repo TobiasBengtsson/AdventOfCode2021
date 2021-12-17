@@ -16,9 +16,9 @@ data Packet = Literal Version Int
             | Op Version ([Int]->Int) LengthTypeId [Packet]
 
 packetLen :: Packet -> Int
-packetLen (Literal _ v) = 6 + 5 * truncate (1 + (logBase 16.0 $ fromIntegral v))
-packetLen (Op _ _ 0 ps)   = 22 + (sum $ map packetLen ps)
-packetLen (Op _ _ 1 ps)   = 18 + (sum $ map packetLen ps)
+packetLen (Literal _ v) = 6 + 5 * truncate (1 + logBase 16.0 (fromIntegral v))
+packetLen (Op _ _ 0 ps)   = 22 + sum (map packetLen ps)
+packetLen (Op _ _ 1 ps)   = 18 + sum (map packetLen ps)
 packetLen _ = error "Invalid case"
 
 versionSum :: Packet -> Int
@@ -49,7 +49,7 @@ getOperator s = case type' s of
 parseB :: Int -> String -> [Packet]
 parseB 0 _ = []
 parseB x _ | x<8 = []
-parseB len s = thisPacket:(parseB (len - thisPacketLen) (drop thisPacketLen s))
+parseB len s = thisPacket : parseB (len - thisPacketLen) (drop thisPacketLen s)
   where
     thisPacket    = parse s
     thisPacketLen = packetLen thisPacket
@@ -57,7 +57,7 @@ parseB len s = thisPacket:(parseB (len - thisPacketLen) (drop thisPacketLen s))
 parseN :: Int -> String -> [Packet]
 parseN 0 _ = []
 parseN x _ | x<0 = error "Packet count negative"
-parseN n s = thisPacket:(parseN (n-1) (drop thisPacketLen s))
+parseN n s = thisPacket : parseN (n-1) (drop thisPacketLen s)
   where 
     thisPacket    = parse s
     thisPacketLen = packetLen thisPacket
@@ -67,7 +67,7 @@ parseLiteral = binToInt . getLiteralBytestring
 
 getLiteralBytestring :: String -> String
 getLiteralBytestring s | length s < 5 = []
-getLiteralBytestring s = if head s == '0' then (drop 1 $ take 5 s) else (drop 1 $ take 5 s) ++ getLiteralBytestring (drop 5 s)
+getLiteralBytestring s = if head s == '0' then drop 1 $ take 5 s else drop 1 (take 5 s) ++ getLiteralBytestring (drop 5 s)
 
 version :: String -> Int
 version = binToInt . take 3
