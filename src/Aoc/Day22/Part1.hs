@@ -7,14 +7,19 @@ import Data.Maybe
 
 newtype Span = Span (Int, Int) deriving (Eq, Ord)
 
+mkSpan a b | b < a = error "Inverted span"
 mkSpan a b = Span (a, b)
 
 cardinalitySpan :: Span -> Int
-cardinalitySpan (Span (a, b)) | b < a = 0
 cardinalitySpan (Span (a, b)) = b - a + 1
 
-intersectSpan :: Span -> Span -> Span
-intersectSpan (Span (a1, a2)) (Span (b1, b2)) = Span (max a1 b1, min a2 b2)
+intersectSpan :: Span -> Span -> Maybe Span
+intersectSpan (Span (a1, a2)) (Span (b1, b2))
+  | max1 <= min2 = Just $ mkSpan max1 min2
+  | otherwise    = Nothing
+  where
+    max1 = max a1 b1
+    min2 = min a2 b2
 
 
 data Cuboid = Cuboid
@@ -26,9 +31,12 @@ data Cuboid = Cuboid
 cardinalityCuboid :: Cuboid -> Int
 cardinalityCuboid (Cuboid x y z) = product $ map cardinalitySpan [x, y, z]
 
-intersectCuboid :: Cuboid -> Cuboid -> Cuboid
-intersectCuboid (Cuboid x1 y1 z1) (Cuboid x2 y2 z2) =
-  Cuboid (intersectSpan x1 x2) (intersectSpan y1 y2) (intersectSpan z1 z2)
+intersectCuboid :: Cuboid -> Cuboid -> Maybe Cuboid
+intersectCuboid (Cuboid x1 y1 z1) (Cuboid x2 y2 z2) = do
+  xspan <- intersectSpan x1 x2
+  yspan <- intersectSpan y1 y2
+  zspan <- intersectSpan z1 z2
+  return $ Cuboid xspan yspan zspan
 
 
 data EngineAction = On | Off
@@ -58,8 +66,8 @@ applyAction (CuboidAction action c) (EngineState adds subtracts) =
     On -> EngineState (MS.insert c $ MS.union subIntersects adds) (MS.union addIntersects subtracts)
     Off -> EngineState (MS.union subIntersects adds) (MS.union addIntersects subtracts)
   where
-    addIntersects = MS.map (intersectCuboid c) adds
-    subIntersects = MS.map (intersectCuboid c) subtracts
+    addIntersects = MS.mapMaybe (intersectCuboid c) adds
+    subIntersects = MS.mapMaybe (intersectCuboid c) subtracts
 
 
 solve :: [BC.ByteString] -> String
