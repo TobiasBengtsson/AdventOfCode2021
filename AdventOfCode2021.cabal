@@ -58,6 +58,8 @@ library
       Aoc.Day23.Part2
       Aoc.Day24.Part1
       Aoc.Day24.Part2
+      Aoc.Day25.Part1
+      Aoc.Day25.Part2
       Aoc.Day3.Part1
       Aoc.Day3.Part2
       Aoc.Day4.Part1

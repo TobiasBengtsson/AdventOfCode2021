@@ -50,6 +50,8 @@ import qualified Aoc.Day23.Part1
 import qualified Aoc.Day23.Part2
 import qualified Aoc.Day24.Part1
 import qualified Aoc.Day24.Part2
+import qualified Aoc.Day25.Part1
+import qualified Aoc.Day25.Part2
 
 getSolver :: String -> String -> [B.ByteString] -> String
 getSolver "1" "1" = Aoc.Day1.Part1.solve
@@ -100,4 +102,6 @@ getSolver "23" "1" = Aoc.Day23.Part1.solve
 getSolver "23" "2" = Aoc.Day23.Part2.solve
 getSolver "24" "1" = Aoc.Day24.Part1.solve
 getSolver "24" "2" = Aoc.Day24.Part2.solve
+getSolver "25" "1" = Aoc.Day25.Part1.solve
+getSolver "25" "2" = Aoc.Day25.Part2.solve
 getSolver _ _ = error "Could not parse arguments correctly"
